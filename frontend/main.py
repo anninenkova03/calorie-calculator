@@ -9,7 +9,7 @@ backend_url = "http://backend:8000"
 def main():
     st.title("Todo App")
 
-    menu = ["Home", "View Todos", "Add Todo", "Update Todo", "Delete Todo"]
+    menu = ["Home111", "View Todos", "Add Todo", "Update Todo", "Delete Todo"]
     choice = st.sidebar.selectbox("Menu", menu)
 
     if choice == "Home":
