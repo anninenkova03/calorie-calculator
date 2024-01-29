@@ -14,7 +14,7 @@ def main():
 
     if choice == "Home":
         st.subheader("Home")
-        st.write("Welcome to the Todo App11!")
+        st.write("Welcome to the Todo App!")
 
     elif choice == "View Todos":
             st.subheader("View Todos")
