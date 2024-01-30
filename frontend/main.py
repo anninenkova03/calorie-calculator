@@ -7,25 +7,52 @@ backend_url = "http://backend:8000"
 
 # Streamlit UI
 def main():
-    st.title("Todo App")
+    st.title("Macronutrient Calculator App")
 
-    menu = ["Home", "View Todos", "Add Todo", "Update Todo", "Delete Todo"]
+    menu = ["Home--",
+            "Journal",
+            "Add Food from List",
+            "Add Custom Food",
+            "Food List--",
+            "Edit Food on List",
+            "Delete Food from List--"]
     choice = st.sidebar.selectbox("Menu", menu)
 
     if choice == "Home":
         st.subheader("Home")
-        st.write("Welcome to the Todo App!")
+        st.write("Welcome to the Macronutrient Calculator App!")
 
-    elif choice == "View Todos":
-            st.subheader("View Todos")
+    elif choice == "Food List":
+            st.subheader("Food List")
             response = httpx.get(f"{backend_url}/api/todo/all")
-            todos = response.json()
-            print(todos)
-            if isinstance(todos, list):
-                for todo in todos:
-                    st.write(f"Title: {todo['title']}, Description: {todo['description']}")
+            foods = response.json()
+            print(foods)
+            if isinstance(foods, list):
+                for food in foods:
+                    st.write(f"{food['title']}:  {food['description']}")
             else:
-                st.write("No todos available.")
+                st.write("No foods available.")
+
+    elif choice == "Delete Food from List":
+            st.subheader("Delete Food from List")
+            food = st.text_input("Food")
+            if st.button("Delete"):
+                response = httpx.delete(f"{backend_url}/api/todo/delete/{food}")
+                if response.status_code == 200:
+                    st.success("Food deleted successfully from the list!")
+                else:
+                    st.error("Failed to delete food. Please make sure the food is on the list and try again.")
+
+    #if choice == "Journal":
+    #if choice == "Add Food from List":
+    #if choice == "Add Custom Food":
+    #if choice == "Edit Food on List":
+
+
+
+
+
+
 
     elif choice == "Add Todo":
         st.subheader("Add Todo")
