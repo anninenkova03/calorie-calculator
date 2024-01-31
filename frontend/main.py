@@ -15,7 +15,7 @@ def main():
             "Add Food from List",
             "Add Custom Food",
             "Food List",
-            "Edit Food on List",
+            "Edit Food Macros",
             "Delete Food from List"]
     choice = st.sidebar.selectbox("Menu", menu)
 
@@ -30,9 +30,9 @@ def main():
         print(foods)
         if isinstance(foods, list):
             for food in foods:
-                st.write(f"{food['title']}:  {food['description']}")
+                st.write(f"{food['title']},  {food['description']} g")
         else:
-            st.write("No foods available.")
+            st.write("No food added.")
 
     elif choice == "Add Food from List":
         st.subheader("Add Food from List")
@@ -42,9 +42,9 @@ def main():
             todo = Todo(title=title, description=description)
             response = httpx.post(f"{backend_url}/api/todo/add", json=todo.dict())
             if response.status_code == 200:
-                st.success("Todo added successfully!")
+                st.success("Food added successfully!")
             else:
-                st.error("Failed to add todo. Please try again later.")
+                st.error("Failed to add food. Please try again later.")
 
     elif choice == "Add Custom Food":
         st.subheader("Add Custom Food")
@@ -54,13 +54,13 @@ def main():
         fat = st.text_input("Fat per 100g")
         description = st.text_input("Amount eaten")
         if st.button("Add"):
-           # food1 = FoodMacros(food=title, macros=np.array([carbs,protein,fat]))
+            food1 = FoodMacros(food=title, macros=np.array([carbs,protein,fat]))
             todo = Todo(title=title, description=description)
             response = httpx.post(f"{backend_url}/api/todo/add", json=todo.dict())
             if response.status_code == 200:
-                st.success("Todo added successfully!")
+                st.success("Food added successfully!")
             else:
-                st.error("Failed to add todo. Please try again later.")
+                st.error("Failed to add food. Please try again later.")
 
     elif choice == "Food List":
             st.subheader("Food List")
@@ -73,7 +73,7 @@ def main():
             else:
                 st.write("No foods available.")
 
-    elif choice == "Edit Food on List":
+    elif choice == "Edit Food Macros":
         st.subheader("Edit Food on List")
         title = st.text_input("Title")
         carbs = st.text_input("Carbs per 100g")
@@ -84,9 +84,9 @@ def main():
         if st.button("Update"):
             response = httpx.put(f"{backend_url}/api/todo/update/{title}", json={"title": title, "description": description})
             if response.status_code == 200:
-                st.success("Todo updated successfully!")
+                st.success("Food macros edited successfully!")
             else:
-                st.error("Failed to update todo. Please make sure the title exists and try again.")
+                st.error("Failed to edit macros. Please make sure the food is on the list and try again.")
 
     elif choice == "Delete Food from List":
             st.subheader("Delete Food from List")
