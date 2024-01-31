@@ -1,6 +1,7 @@
 import streamlit as st
 import httpx
-from model import Todo
+from model import Todo, FoodMacros
+import numpy as np
 
 # Base URL for the API
 backend_url = "http://backend:8000"
@@ -22,7 +23,16 @@ def main():
         st.subheader("Home")
         st.write("Welcome to the Macronutrient Calculator App!")
 
-    #elif choice == "Journal":
+    elif choice == "Journal":
+        st.subheader("Journal")
+        response = httpx.get(f"{backend_url}/api/todo/all")
+        foods = response.json()
+        print(foods)
+        if isinstance(foods, list):
+            for food in foods:
+                st.write(f"{food['title']}:  {food['description']}")
+        else:
+            st.write("No foods available.")
 
     elif choice == "Add Food from List":
         st.subheader("Add Food from List")
@@ -44,6 +54,7 @@ def main():
         fat = st.text_input("Fat per 100g")
         description = st.text_input("Amount eaten")
         if st.button("Add"):
+           # food1 = FoodMacros(food=title, macros=np.array([carbs,protein,fat]))
             todo = Todo(title=title, description=description)
             response = httpx.post(f"{backend_url}/api/todo/add", json=todo.dict())
             if response.status_code == 200:

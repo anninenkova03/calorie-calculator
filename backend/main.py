@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
-from model import Todo
+from model import Todo, FoodMacros
 from fastapi.middleware.cors import CORSMiddleware
+import numpy as np
 
 import httpx
 

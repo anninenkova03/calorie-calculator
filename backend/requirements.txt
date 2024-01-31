@@ -5,3 +5,4 @@ pytest
 motor
 httpx
 pytest-asyncio
+numpy
