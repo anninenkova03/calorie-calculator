@@ -1,8 +1,6 @@
 fastapi
 uvicorn 
 pydantic
-pytest
 motor
 httpx
-pytest-asyncio
 numpy

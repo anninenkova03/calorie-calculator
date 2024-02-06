@@ -8,8 +8,8 @@ from db import(
     fetch_all_food,
     fetch_one_food,
     create_food,
-    update_food,
     remove_food,
+    calculate_total_macros_and_cals
 )
 # App
 app = FastAPI()
@@ -25,13 +25,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-macrosTotal = np.zeros(3)
-calsPerG = np.array([4, 9, 4])
-
 @app.get("/")
 def read_route():
     return {"Send": "Receive"}
-
 
 
 @app.get("/api/food/all", name="trial")
@@ -41,11 +37,10 @@ async def get_food():
     return response
 
 
-
 @app.get("/api/food/{name}", response_model=Food)
 async def get_food_by_name(name):
     async with httpx.AsyncClient() as client:
-        response = await fetch_one_food(client, name)
+        response = await fetch_one_food(name)
     if response:
         return response
     raise HTTPException(404, f"Could not find a food with this name {name}")
@@ -53,36 +48,23 @@ async def get_food_by_name(name):
 
 @app.post("/api/food/add", response_model=Food)
 async def post_food(food: Food):
-    global macrosTotal
     async with httpx.AsyncClient() as client:
         response = await create_food(food.dict())
     if response:
-        # Calculate macronutrients and update the array
-        macrosTotal += np.array([food.carbs, food.fat, food.protein]) * food.amount
         return response
     raise HTTPException(400, f"Problem! Try again later")
 
-
-@app.put("/api/food/update/{name}", response_model=Food)
-async def put_food(food: Food):
-    async with httpx.AsyncClient() as client:
-        response = await update_food(food.dict())
-    if response:
-        return response
-    raise HTTPException(404, f"Could not find a food with this name {name}")
-
 @app.delete("/api/food/delete/{name}")
 async def delete_food(name):
-    global macrosTotal
     async with httpx.AsyncClient() as client:
-        food = await fetch_one_food(name)
-    if food:
-        macrosTotal -= np.array([food['carbs'], food['fat'], food['protein']]) * food['amount']
-        async with httpx.AsyncClient() as client:
-            response = await remove_food(name)
-        if response:
-            return response
-        else:
-            raise HTTPException(500, f"Failed to delete food: {name}")
+        response = await remove_food(name)
+    if response:
+        return response
     else:
         raise HTTPException(404, f"Could not find a food with this name: {name}")
+
+@app.get("/api/food/calculate_total_macros_and_cals")
+async def calculate_total_macros_and_cals():
+    async with httpx.AsyncClient() as client:
+        response = await calculate_total_macros_and_cals()
+    return response

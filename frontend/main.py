@@ -24,18 +24,28 @@ def main():
 
     elif choice == "Journal":
         st.subheader("Journal")
-        #st.write("No food added to journal so far.")
+
+        try:
+            response = httpx.get(f"{backend_url}/api/food/calculate_total_macros_and_cals")
+            data = response.json()
+            # Check if 'sumMacros' key exists in the response
+            if 'sumMacros' in data :
+                st.write(f"You have logged {data['sumMacros'][0]}g carbs, {data['sumMacros'][1]}g fat, {data['sumMacros'][2]}g protein today.")
+                st.write(f"This is to say {data['sumCals']}kcal in total.")
+        except KeyError:
+            st.error("Key 'sumMacros' not found in the response. Please check the backend endpoint.")
+
         response = httpx.get(f"{backend_url}/api/food/all")
         foods = response.json()
-        print(foods)
+        #print(foods)
         if isinstance(foods, list):
             for food in foods:
                 st.write(f"{food['name']},  {food['amount']}g")
         else:
-            st.write("No food added to journal so far.")
+            st.write("No food added to the journal so far.")
 
     elif choice == "Macros":
-            st.subheader("Macros")
+            st.subheader("Macronutrients per 100g")
             response = httpx.get(f"{backend_url}/api/food/all")
             foods = response.json()
             print(foods)
@@ -58,7 +68,7 @@ def main():
             if response.status_code == 200:
                 st.success("Food added successfully!")
             else:
-                st.error("Failed to add food. Please make sure there isn't a food with that name already and try again.")
+                st.error("Failed to add food. Please try again later.")
 
     elif choice == "Delete Food":
         st.subheader("Delete Food")
