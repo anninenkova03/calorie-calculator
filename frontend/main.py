@@ -1,6 +1,6 @@
 import streamlit as st
 import httpx
-from model import Todo, FoodMacros
+from model import Food
 import numpy as np
 
 # Base URL for the API
@@ -12,11 +12,9 @@ def main():
 
     menu = ["Home",
             "Journal",
-            "Add Food from List",
-            "Add Custom Food",
-            "Food List",
-            "Edit Food Macros",
-            "Delete Food from List"]
+            "Macros",
+            "Add Food"
+            ]
     choice = st.sidebar.selectbox("Menu", menu)
 
     if choice == "Home":
@@ -25,123 +23,82 @@ def main():
 
     elif choice == "Journal":
         st.subheader("Journal")
-        response = httpx.get(f"{backend_url}/api/todo/all")
+        #st.write("No food added to journal so far.")
+        response = httpx.get(f"{backend_url}/api/food/all")
         foods = response.json()
         print(foods)
         if isinstance(foods, list):
             for food in foods:
-                st.write(f"{food['title']},  {food['description']} g")
+                st.write(f"{food['name']},  {food['amount']}g")
         else:
-            st.write("No food added.")
+            st.write("No food added to journal so far.")
 
-    elif choice == "Add Food from List":
-        st.subheader("Add Food from List")
-        title = st.text_input("Food")
-        description = st.text_input("Amount eaten")
-        if st.button("Add"):
-            todo = Todo(title=title, description=description)
-            response = httpx.post(f"{backend_url}/api/todo/add", json=todo.dict())
-            if response.status_code == 200:
-                st.success("Food added successfully!")
-            else:
-                st.error("Failed to add food. Please try again later.")
-
-    elif choice == "Add Custom Food":
-        st.subheader("Add Custom Food")
-        title = st.text_input("Food")
-        carbs = st.text_input("Carbs per 100g")
-        protein = st.text_input("Protein per 100g")
-        fat = st.text_input("Fat per 100g")
-        description = st.text_input("Amount eaten")
-        if st.button("Add"):
-            food1 = FoodMacros(food=title, macros=np.array([carbs,protein,fat]))
-            todo = Todo(title=title, description=description)
-            response = httpx.post(f"{backend_url}/api/todo/add", json=todo.dict())
-            if response.status_code == 200:
-                st.success("Food added successfully!")
-            else:
-                st.error("Failed to add food. Please try again later.")
-
-    elif choice == "Food List":
-            st.subheader("Food List")
-            response = httpx.get(f"{backend_url}/api/todo/all")
+    elif choice == "Macros":
+            st.subheader("Macros")
+            response = httpx.get(f"{backend_url}/api/food/all")
             foods = response.json()
             print(foods)
             if isinstance(foods, list):
                 for food in foods:
-                    st.write(f"{food['title']}:  {food['description']}")
+                    st.write(f"{food['name']}:  {food['carbs']}g carbs, {food['fat']}g fat, {food['protein']}g protein")
             else:
-                st.write("No foods available.")
+                st.write("No macros logged so far.")
+
+    elif choice == "Add Food":
+        st.subheader("Add Food")
+        name = st.text_input("Food")
+        carbs = st.number_input("Carbs per 100g", step=1, value=0, format="%d")
+        fat = st.number_input("Fat per 100g", step=1, value=0, format="%d")
+        protein = st.number_input("Protein per 100g", step=1, value=0, format="%d")
+        amount = st.number_input("Amount in g", step=1, value=0, format="%d")
+        if st.button("Add"):
+            food = Food(name=name, carbs=carbs, fat=fat, protein=protein, amount=amount)
+            response = httpx.post(f"{backend_url}/api/food/add", json=food.dict())
+            if response.status_code == 200:
+                st.success("Food added successfully!")
+            else:
+                st.error("Failed to add food. Please make sure there isn't a food with that name already and try again.")
+
+
+
+
+    elif choice == "Delete Food":
+            st.subheader("Delete Food")
+            name = st.text_input("Food")
+            if st.button("Delete"):
+                response = httpx.delete(f"{backend_url}/api/food/delete/{name}")
+                if response.status_code == 200:
+                    st.success("Food deleted successfully!")
+                else:
+                    st.error("Failed to delete food. Please check the name of the food and try again.")
+
+    elif choice == "Add Food from List":
+        st.subheader("Add Food from List")
+        name = st.text_input("Food")
+        amount = st.text_input("Amount in g")
+        if st.button("Add"):
+            #food = Food(name=name, macros=np.array([1, 2, 3]), amount=amount)
+            response = httpx.put(f"{backend_url}/api/food/update/{name}", json={"name": name})
+            #response = httpx.post(f"{backend_url}/api/food/add", json=food.dict())
+            if response.status_code == 200:
+                st.success("Food added successfully!")
+            else:
+                st.error("Failed to add food. Please try again later.")
 
     elif choice == "Edit Food Macros":
         st.subheader("Edit Food on List")
-        title = st.text_input("Title")
+        name = st.text_input("Food")
         carbs = st.text_input("Carbs per 100g")
         protein = st.text_input("Protein per 100g")
         fat = st.text_input("Fat per 100g")
-        description = st.text_area("Description")
-        print(f"This is title {title} and this is description {description}")
-        if st.button("Update"):
-            response = httpx.put(f"{backend_url}/api/todo/update/{title}", json={"title": title, "description": description})
+        #print(f"This is name {name} and this is macros {macros}")
+        if st.button("Edit"):
+            response = httpx.put(f"{backend_url}/api/food/update/{name}", json={"name": name, "macros": macros})
             if response.status_code == 200:
                 st.success("Food macros edited successfully!")
             else:
                 st.error("Failed to edit macros. Please make sure the food is on the list and try again.")
 
-    elif choice == "Delete Food from List":
-            st.subheader("Delete Food from List")
-            food = st.text_input("Food")
-            if st.button("Delete"):
-                response = httpx.delete(f"{backend_url}/api/todo/delete/{food}")
-                if response.status_code == 200:
-                    st.success("Food deleted successfully from the list!")
-                else:
-                    st.error("Failed to delete food. Please make sure the food is on the list and try again.")
-
-
-
-
-
-
-
-
-
-
-
-
-    elif choice == "Add Todo":
-        st.subheader("Add Todo")
-        title = st.text_input("Title")
-        description = st.text_area("Description")
-        if st.button("Add"):
-            todo = Todo(title=title, description=description)
-            response = httpx.post(f"{backend_url}/api/todo/add", json=todo.dict())
-            if response.status_code == 200:
-                st.success("Todo added successfully!")
-            else:
-                st.error("Failed to add todo. Please try again later.")
-
-    elif choice == "Update Todo":
-        st.subheader("Update Todo")
-        title = st.text_input("Title")
-        description = st.text_area("Description")
-        print(f"This is title {title} and this is description {description}")
-        if st.button("Update"):
-            response = httpx.put(f"{backend_url}/api/todo/update/{title}", json={"title": title, "description": description})
-            if response.status_code == 200:
-                st.success("Todo updated successfully!")
-            else:
-                st.error("Failed to update todo. Please make sure the title exists and try again.")
-
-    elif choice == "Delete Todo":
-        st.subheader("Delete Todo")
-        title = st.text_input("Title")
-        if st.button("Delete"):
-            response = httpx.delete(f"{backend_url}/api/todo/delete/{title}")
-            if response.status_code == 200:
-                st.success("Todo deleted successfully!")
-            else:
-                st.error("Failed to delete todo. Please make sure the title exists and try again.")
 
 if __name__ == "__main__":
     main()

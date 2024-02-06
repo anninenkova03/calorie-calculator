@@ -1,16 +1,15 @@
 from fastapi import FastAPI, HTTPException
-from model import Todo, FoodMacros
+from model import Food
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
-
 import httpx
 
 from db import(
-    fetch_all_todo,
-    fetch_one_todo,
-    create_todo,
-    update_todo,
-    remove_todo,
+    fetch_all_food,
+    fetch_one_food,
+    create_food,
+    update_food,
+    remove_food,
 )
 # App
 app = FastAPI()
@@ -29,49 +28,49 @@ app.add_middleware(
 
 @app.get("/")
 def read_route():
-    return {"Send": "Recive"}
+    return {"Send": "Receive"}
 
 
 
-@app.get("/api/todo/all", name="trial")
-async def get_todo():
+@app.get("/api/food/all", name="trial")
+async def get_food():
     async with httpx.AsyncClient() as client:
-        response = await fetch_all_todo()
+        response = await fetch_all_food()
     return response
 
 
 
-@app.get("/api/todo/{title}", response_model=Todo)
-async def get_todo_by_id(title):
+@app.get("/api/food/{name}", response_model=Food)
+async def get_food_by_name(name):
     async with httpx.AsyncClient() as client:
-        response = await fetch_one_todo(client, title)
+        response = await fetch_one_food(client, name)
     if response:
         return response
-    raise HTTPException(404, f"Could not find a todo with this title {title}")
+    raise HTTPException(404, f"Could not find a food with this name {name}")
 
 
-@app.post("/api/todo/add", response_model=Todo)
-async def post_todo(todo: Todo):
+@app.post("/api/food/add", response_model=Food)
+async def post_food(food: Food):
     async with httpx.AsyncClient() as client:
-        response = await create_todo(todo.dict())
+        response = await create_food(food.dict())
     if response:
         return response
-    raise HTTPException(400, f"Problem! try again later")
+    raise HTTPException(400, f"Problem! Try again later")
 
 
-@app.put("/api/todo/update/{title}", response_model=Todo)
-async def put_todo(todo: Todo):
+@app.put("/api/food/update/{name}", response_model=Food)
+async def put_food(food: Food):
     async with httpx.AsyncClient() as client:
-        response = await update_todo(todo.dict())
+        response = await update_food(food.dict())
     if response:
         return response
-    raise HTTPException(404, f"Could not find a todo with this title {title}")
+    raise HTTPException(404, f"Could not find a food with this name {name}")
 
 
-@app.delete("/api/todo/delete/{title}")
-async def delete_todo(title):
+@app.delete("/api/food/delete/{name}")
+async def delete_food(name):
     async with httpx.AsyncClient() as client:
-        response = await remove_todo(title)
+        response = await remove_food(name)
     if response:
         return response
-    raise HTTPException(404, f"Could not find a todo with this title {title}")
+    raise HTTPException(404, f"Could not find a food with this name {name}")

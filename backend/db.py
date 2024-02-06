@@ -1,48 +1,48 @@
-
-from model import Todo
+from model import Food
 import motor.motor_asyncio
 
 client = motor.motor_asyncio.AsyncIOMotorClient('mongodb://admin:admin@db-container:27017')
+# Database Journal
+database = client['Journal']
+# Collection Food
+collection = database.food
 
 
-# Database TodoList
-database = client['TodoList']
-# Collection Todo
-collection = database.todo
-
-
-async def fetch_all_todo():
-    todos = []
+async def fetch_all_food():
+    foods = []
     cursor = collection.find({})
     async for document in cursor:
         # **document- any document
-        todos.append(Todo(**document))
+        foods.append(Food(**document))
 
-    return todos
+    return foods
 
 
-async def fetch_one_todo(title):
-    document = await collection.find_one({"title": title})
+async def fetch_one_food(name):
+    document = await collection.find_one({"name": name})
     return document
 
 
-async def create_todo(todo):
-    document = todo
+async def create_food(food):
+    document = food
     # await dor the collection to insert the document
     result = await collection.insert_one(document)
     return document
 
 
-async def update_todo(todo):
-    description = todo['description']
-    title = todo['title']
-    await collection.update_one({"title": title}, {"$set": {"description": description}})
-    document = await collection.find_one({"title": title})
+async def update_food(food):
+    name = food['name']
+    carbs = food['carbs']
+    fat = food['fat']
+    protein = food['protein']
+    amount = food['amount']
+    await collection.update_one({"name": name}, {"$set": {"carbs": carbs, "fat": fat, "protein": protein}})
+    document = await collection.find_one({"name": name})
 
     return document
 
 
-async def remove_todo(title):
-    await collection.delete_one({"title": title})
+async def remove_food(name):
+    await collection.delete_one({"name": name})
     return True
 
