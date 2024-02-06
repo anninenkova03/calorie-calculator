@@ -63,7 +63,7 @@ async def delete_food(name):
     else:
         raise HTTPException(404, f"Could not find a food with this name: {name}")
 
-@app.get("/api/food/calculate_total_macros_and_cals")
+@app.get("/api/food/calculate_total")
 async def calculate_total_macros_and_cals():
     async with httpx.AsyncClient() as client:
         response = await calculate_total_macros_and_cals()

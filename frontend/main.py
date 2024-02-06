@@ -26,7 +26,7 @@ def main():
         st.subheader("Journal")
 
         try:
-            response = httpx.get(f"{backend_url}/api/food/calculate_total_macros_and_cals")
+            response = httpx.get(f"{backend_url}/api/food/calculate_total")
             data = response.json()
             # Check if 'sumMacros' key exists in the response
             if 'sumMacros' in data :
@@ -37,8 +37,7 @@ def main():
 
         response = httpx.get(f"{backend_url}/api/food/all")
         foods = response.json()
-        #print(foods)
-        if isinstance(foods, list):
+        if isinstance(foods, list) and foods:
             for food in foods:
                 st.write(f"{food['name']},  {food['amount']}g")
         else:
@@ -48,8 +47,7 @@ def main():
             st.subheader("Macronutrients per 100g")
             response = httpx.get(f"{backend_url}/api/food/all")
             foods = response.json()
-            print(foods)
-            if isinstance(foods, list):
+            if isinstance(foods, list) and foods:
                 for food in foods:
                     st.write(f"{food['name']}:  {food['carbs']}g carbs, {food['fat']}g fat, {food['protein']}g protein")
             else:

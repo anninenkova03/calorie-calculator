@@ -11,20 +11,19 @@ collection = database.food
 
 async def fetch_all_food():
     foods = []
-    cursor = collection.find({})
-    async for document in cursor:
-        # **document- any document
+    documents = collection.find({})
+    async for document in documents:
         foods.append(Food(**document))
     return foods
 
 
 async def calculate_total_macros_and_cals():
     sumMacros = np.zeros(3)
-    cursor = collection.find({})
-    async for food in cursor:
-        sumMacros += np.array([food['carbs'], food['fat'], food['protein']]) * food['amount'] / 100
+    documents = collection.find({})
+    async for document in documents:
+        sumMacros += np.array([document['carbs'], document['fat'], document['protein']]) * document['amount'] / 100
     sumCals = np.dot(np.array([4, 9, 4]), sumMacros)
-    return {'sumMacros': sumMacros.tolist(), 'sumCals': sumCals}
+    return {"sumMacros": sumMacros.tolist(), "sumCals": sumCals}
 
 
 async def fetch_one_food(name):
@@ -34,12 +33,14 @@ async def fetch_one_food(name):
 
 async def create_food(food):
     document = food
-    # await dor the collection to insert the document
     result = await collection.insert_one(document)
     return document
 
 
 async def remove_food(name):
-    await collection.delete_one({"name": name})
-    return True
+    result = await collection.delete_one({"name": name})
+    if result.deleted_count == 1:
+        return True
+    else:
+        return False
 
