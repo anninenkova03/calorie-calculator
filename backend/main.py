@@ -25,6 +25,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+macrosTotal = np.zeros(3)
+calsPerG = np.array([4, 9, 4])
 
 @app.get("/")
 def read_route():
@@ -51,9 +53,12 @@ async def get_food_by_name(name):
 
 @app.post("/api/food/add", response_model=Food)
 async def post_food(food: Food):
+    global macrosTotal
     async with httpx.AsyncClient() as client:
         response = await create_food(food.dict())
     if response:
+        # Calculate macronutrients and update the array
+        macrosTotal += np.array([food.carbs, food.fat, food.protein]) * food.amount
         return response
     raise HTTPException(400, f"Problem! Try again later")
 
@@ -66,11 +71,18 @@ async def put_food(food: Food):
         return response
     raise HTTPException(404, f"Could not find a food with this name {name}")
 
-
 @app.delete("/api/food/delete/{name}")
 async def delete_food(name):
+    global macrosTotal
     async with httpx.AsyncClient() as client:
-        response = await remove_food(name)
-    if response:
-        return response
-    raise HTTPException(404, f"Could not find a food with this name {name}")
+        food = await fetch_one_food(name)
+    if food:
+        macrosTotal -= np.array([food['carbs'], food['fat'], food['protein']]) * food['amount']
+        async with httpx.AsyncClient() as client:
+            response = await remove_food(name)
+        if response:
+            return response
+        else:
+            raise HTTPException(500, f"Failed to delete food: {name}")
+    else:
+        raise HTTPException(404, f"Could not find a food with this name: {name}")
