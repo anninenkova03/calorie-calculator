@@ -9,7 +9,7 @@ from db import(
     fetch_one_food,
     create_food,
     remove_food,
-    calculate_total_macros_and_cals
+    calculate
 )
 # App
 app = FastAPI()
@@ -22,15 +22,15 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
 @app.get("/")
 def read_route():
-    return {"Send": "Receive"}
+    return {"Send": "Recieved"}
 
 
-@app.get("/api/food/all", name="trial")
+@app.get("/api/food/all")
 async def get_food():
     async with httpx.AsyncClient() as client:
         response = await fetch_all_food()
@@ -63,8 +63,8 @@ async def delete_food(name):
     else:
         raise HTTPException(404, f"Could not find a food with this name: {name}")
 
-@app.get("/api/food/calculate_total")
-async def calculate_total_macros_and_cals():
+@app.get("/api/food/calculate", response_model=dict)
+async def calculate():
     async with httpx.AsyncClient() as client:
-        response = await calculate_total_macros_and_cals()
+        response = await calculate()
     return response

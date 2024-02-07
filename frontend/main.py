@@ -26,9 +26,9 @@ def main():
         st.subheader("Journal")
 
         try:
-            response = httpx.get(f"{backend_url}/api/food/calculate_total")
+            response = httpx.get(f"{backend_url}/api/food/calculate")
             data = response.json()
-            # Check if 'sumMacros' key exists in the response
+            # Check if 'sumMacros' key exists in the data
             if 'sumMacros' in data :
                 st.write(f"You have logged {data['sumMacros'][0]}g carbs, {data['sumMacros'][1]}g fat, {data['sumMacros'][2]}g protein today.")
                 st.write(f"This is to say {data['sumCals']}kcal in total.")

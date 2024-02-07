@@ -17,7 +17,7 @@ async def fetch_all_food():
     return foods
 
 
-async def calculate_total_macros_and_cals():
+async def calculate():
     sumMacros = np.zeros(3)
     documents = collection.find({})
     async for document in documents:
