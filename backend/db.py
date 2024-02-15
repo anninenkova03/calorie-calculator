@@ -31,11 +31,19 @@ async def fetch_one_food(name):
     return document
 
 
-async def create_food(food):
-    document = food
-    result = await collection.insert_one(document)
-    return document
+#async def create_food(food):
+#    document = food
+#    result = await collection.insert_one(document)
+#    return document
 
+async def create_food(food):
+    addedFood = await collection.find_one({"name": food['name']})
+    if addedFood:
+        raise HTTPException(status_code=400, detail=f"Food with that name already added.")
+    else:
+        document = food
+        result = await collection.insert_one(document)
+        return document
 
 async def remove_food(name):
     result = await collection.delete_one({"name": name})

@@ -47,7 +47,7 @@ async def get_food_by_name(name):
 
 
 @app.post("/api/food/add", response_model=Food)
-async def post_food(food: Food):
+async def post_food(food:Food):
     async with httpx.AsyncClient() as client:
         response = await create_food(food.dict())
     if response:

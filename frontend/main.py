@@ -66,7 +66,7 @@ def main():
             if response.status_code == 200:
                 st.success("Food added successfully!")
             else:
-                st.error("Failed to add food. Please try again later.")
+                st.error("Failed to add food. Please make sure there isn't any food with that name added already.")
 
     elif choice == "Delete Food":
         st.subheader("Delete Food")
@@ -76,7 +76,7 @@ def main():
             if response.status_code == 200:
                 st.success("Food deleted successfully!")
             else:
-                st.error("Failed to delete food. Please check the name of the food and try again.")
+                st.error("Failed to delete food. Please make sure food with that name has been added and try again.")
 
 if __name__ == "__main__":
     main()
