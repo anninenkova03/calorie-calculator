@@ -9,7 +9,7 @@ from db import(
     fetch_one_food,
     create_food,
     remove_food,
-    calculate
+    calculate_calories
 )
 # App
 app = FastAPI()
@@ -37,6 +37,13 @@ async def get_food():
     return response
 
 
+@app.get("/api/food/calories")
+async def get_calories():
+    async with httpx.AsyncClient() as client:
+        response = await calculate_calories()
+    return response
+
+
 @app.get("/api/food/{name}", response_model=Food)
 async def get_food_by_name(name):
     async with httpx.AsyncClient() as client:
@@ -54,6 +61,7 @@ async def post_food(food:Food):
         return response
     raise HTTPException(400, f"Problem! Try again later")
 
+
 @app.delete("/api/food/delete/{name}")
 async def delete_food(name):
     async with httpx.AsyncClient() as client:
@@ -62,6 +70,7 @@ async def delete_food(name):
         return response
     else:
         raise HTTPException(404, f"Could not find a food with this name: {name}")
+
 
 @app.get("/api/food/calculate", response_model=dict)
 async def calculate():

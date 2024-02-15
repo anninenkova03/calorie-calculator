@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+import numpy as np
 
 class Food(BaseModel):
     name: str
@@ -6,3 +7,6 @@ class Food(BaseModel):
     fat: float
     protein: float
     amount: float
+
+    def getMacros(self):
+        return np.array([self.carbs, self.fat, self.protein]) * [self.amount]

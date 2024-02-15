@@ -8,7 +8,7 @@ backend_url = "http://backend:8000"
 
 # Streamlit UI
 def main():
-    st.title("Macronutrient Calculator App")
+    st.title("Calorie Calculator App")
 
     menu = ["Home",
             "Journal",
@@ -20,38 +20,30 @@ def main():
 
     if choice == "Home":
         st.subheader("Home")
-        st.write("Welcome to the Macronutrient Calculator App!")
+        st.write("Welcome to the Calorie Calculator App!")
 
     elif choice == "Journal":
         st.subheader("Journal")
-
-        try:
-            response = httpx.get(f"{backend_url}/api/food/calculate")
-            data = response.json()
-            # Check if 'sumMacros' key exists in the data
-            if 'sumMacros' in data :
-                st.write(f"You have logged {data['sumMacros'][0]}g carbs, {data['sumMacros'][1]}g fat, {data['sumMacros'][2]}g protein today.")
-                st.write(f"This is to say {data['sumCals']}kcal in total.")
-        except KeyError:
-            st.error("Key 'sumMacros' not found in the response. Please check the backend endpoint.")
-
         response = httpx.get(f"{backend_url}/api/food/all")
         foods = response.json()
         if isinstance(foods, list) and foods:
             for food in foods:
                 st.write(f"{food['name']},  {food['amount']}g")
+            response = httpx.get(f"{backend_url}/api/food/calories")
+            calories = response.json()
+            st.write(f"Logged food amounts to a total of {calories} kcal.")
         else:
             st.write("No food added to the journal so far.")
 
     elif choice == "Macros":
-            st.subheader("Macronutrients per 100g")
-            response = httpx.get(f"{backend_url}/api/food/all")
-            foods = response.json()
-            if isinstance(foods, list) and foods:
-                for food in foods:
-                    st.write(f"{food['name']}:  {food['carbs']}g carbs, {food['fat']}g fat, {food['protein']}g protein")
-            else:
-                st.write("No macros logged so far.")
+        st.subheader("Macronutrients per 100g")
+        response = httpx.get(f"{backend_url}/api/food/all")
+        foods = response.json()
+        if isinstance(foods, list) and foods:
+            for food in foods:
+                st.write(f"{food['name']}:  {food['carbs']} g carbs, {food['fat']} g fat, {food['protein']} g protein")
+        else:
+            st.write("No macros logged so far.")
 
     elif choice == "Add Food":
         st.subheader("Add Food")
@@ -66,7 +58,7 @@ def main():
             if response.status_code == 200:
                 st.success("Food added successfully!")
             else:
-                st.error("Failed to add food. Please make sure there isn't any food with that name added already.")
+                st.error("Failed to add food. Please make sure there isn't any food with that name already and the macronutrients sum up to 100g.")
 
     elif choice == "Delete Food":
         st.subheader("Delete Food")
