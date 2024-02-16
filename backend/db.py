@@ -18,10 +18,11 @@ async def fetch_all_food():
 
 async def calculate_calories():
     sumMacros = np.zeros(3)
+    caloriesPerG = np.array([4,9,4])
     documents = collection.find({})
     async for document in documents:
         sumMacros += np.array([document['carbs'], document['fat'], document['protein']]) * document['amount'] / 100
-    return np.dot(np.array([4,9,4]), sumMacros)
+    return np.dot(caloriesPerG, sumMacros)
 
 async def fetch_one_food(name):
     document = await collection.find_one({"name": name})

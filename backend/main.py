@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from model import Food
 from fastapi.middleware.cors import CORSMiddleware
-import numpy as np
 import httpx
 
 from db import(
@@ -11,6 +10,7 @@ from db import(
     remove_food,
     calculate_calories
 )
+
 # App
 app = FastAPI()
 
@@ -70,10 +70,3 @@ async def delete_food(name):
         return response
     else:
         raise HTTPException(404, f"Could not find a food with this name: {name}")
-
-
-@app.get("/api/food/calculate", response_model=dict)
-async def calculate():
-    async with httpx.AsyncClient() as client:
-        response = await calculate()
-    return response

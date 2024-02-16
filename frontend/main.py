@@ -1,7 +1,6 @@
 import streamlit as st
 import httpx
 from model import Food
-import numpy as np
 
 # Base URL for the API
 backend_url = "http://backend:8000"
@@ -41,7 +40,7 @@ def main():
         foods = response.json()
         if isinstance(foods, list) and foods:
             for food in foods:
-                st.write(f"{food['name']}:  {food['carbs']} g carbs, {food['fat']} g fat, {food['protein']} g protein")
+                st.write(f"{food['name']}:  {food['carbs']}g carbs, {food['fat']}g fat, {food['protein']}g protein")
         else:
             st.write("No macros logged so far.")
 
