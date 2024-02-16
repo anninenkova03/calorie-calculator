@@ -25,7 +25,7 @@ def main():
         st.subheader("Journal")
         response = httpx.get(f"{backend_url}/api/food/all")
         foods = response.json()
-        if isinstance(foods, list) and foods:
+        if foods:
             for food in foods:
                 st.write(f"{food['name']},  {food['amount']}g")
             response = httpx.get(f"{backend_url}/api/food/calories")
@@ -38,7 +38,7 @@ def main():
         st.subheader("Macronutrients per 100g")
         response = httpx.get(f"{backend_url}/api/food/all")
         foods = response.json()
-        if isinstance(foods, list) and foods:
+        if foods:
             for food in foods:
                 st.write(f"{food['name']}:  {food['carbs']}g carbs, {food['fat']}g fat, {food['protein']}g protein")
         else:
