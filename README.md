@@ -7,12 +7,12 @@ https://github.com/EASS-HIT-PART-A-2022-CLASS-III/todolist/assets/81169397/3a783
 ## Installation
 1. Clone the repository to your local machine.
 ```
-git clone https://github.com/anninenkova03/macronutrient-calculator.git
+git clone https://github.com/anninenkova03/calorie-calculator.git
 
 ```
 2. Run from the directory
 ```
-cd macronutrient-calculator
+cd calorie-calculator
 docker-compose build (for the first time)
 docker-compose up
 ```
